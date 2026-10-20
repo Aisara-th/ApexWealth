@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <script>
@@ -46,16 +47,16 @@
       font-family: 'Prompt', 'Plus Jakarta Sans', sans-serif;
       background-color: #f3f2ee;
       color: #0f172a;
-      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: 24px;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
     }
     #floating-bottom-nav {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 8px);
     }
     /* Responsive Touch & Mobile/Tablet Optimizations (iPhone / Android / iPad) */
     @media (max-width: 767px) {
-      input[type="text"], input[type="number"], select {
+      input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="password"], select {
         font-size: 16px !important; /* Prevents iOS Safari auto-zoom on focus */
         min-height: 44px; /* Apple HIG 44pt minimum touch target */
       }
@@ -65,9 +66,6 @@
       }
       .report-page {
         padding: 1.15rem !important;
-      }
-      .tab-buttons {
-        display: none !important; /* Use thumb-friendly bottom dock on phones */
       }
     }
     @media (min-width: 768px) and (max-width: 1023px) {
@@ -219,6 +217,7 @@
       font-family: 'JetBrains Mono', 'Prompt', monospace;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.02em;
+      white-space: nowrap;
     }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
@@ -268,41 +267,182 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 10mm 10mm 10mm 10mm;
+        margin: 6mm 7mm 6mm 7mm;
       }
-      body {
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+      html, body {
         background-color: #ffffff !important;
         color: #0f172a !important;
-        font-size: 9.5pt;
-        padding-bottom: 0 !important;
+        font-size: 8.5pt !important;
+        line-height: 1.3 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
       }
-      .no-print, nav, .tab-buttons, #floating-bottom-nav, #toast-container, header {
+      .no-print, nav, .tab-buttons, #floating-bottom-nav, #toast-container, header, #modal-policy, #modal-auth-gate, #modal-admin-cloud, #modal-quota-upgrade {
         display: none !important;
       }
-      .print-break-inside-avoid {
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-      .print-page-break {
-        page-break-after: always;
-        break-after: page;
-      }
-      .a4-page-sheet {
+      main#main-workspace,
+      main.sim-ipad,
+      main.sim-mobile {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
         box-shadow: none !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 8px !important;
-        padding: 16px 20px !important;
-        margin-bottom: 0 !important;
+        background: #ffffff !important;
+        opacity: 1 !important;
+        filter: none !important;
       }
       .tab-panel {
         display: none !important;
       }
       #tab-report {
         display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-      .wealth-card {
+      #printable-report {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      #printable-report > * + * {
+        margin-top: 0 !important;
+      }
+      .report-page {
+        background: #ffffff !important;
         box-shadow: none !important;
-        border: 1px solid #cbd5e1 !important;
+        border: 1.5px solid #64748b !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        margin: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+        box-sizing: border-box !important;
+      }
+      .report-page > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 8px !important;
+      }
+      .report-page .p-5,
+      .report-page .p-4,
+      .report-page .p-3\.5 {
+        padding: 7px 10px !important;
+      }
+      .print-page-break {
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+      /* Prevent numbers and currency from splitting across lines */
+      .num-tabular,
+      .report-page td.text-right,
+      .report-page th.text-right,
+      .report-page strong.num-tabular,
+      .report-page span.num-tabular {
+        white-space: nowrap !important;
+        word-break: keep-all !important;
+        overflow-wrap: normal !important;
+      }
+      /* Preserve multi-column grids on A4 portrait even if iPad/Mobile mode was active */
+      #global-kpi-bar {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+      }
+      .report-page .lg\:grid-cols-4 {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+      }
+      .report-page .md\:grid-cols-12 {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+      }
+      .report-page .md\:col-span-5 {
+        grid-column: span 5 / span 5 !important;
+      }
+      .report-page .md\:col-span-7 {
+        grid-column: span 7 / span 7 !important;
+      }
+      .report-page .md\:grid-cols-3,
+      .report-page .sm\:grid-cols-3 {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+      }
+      .report-page .md\:grid-cols-2,
+      .report-page .sm\:grid-cols-2 {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+      }
+      .report-page .sm\:flex-row {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+      }
+      .report-page .sm\:text-right {
+        text-align: right !important;
+      }
+      /* Ensure tables fit 100% of A4 width without horizontal clipping */
+      .report-page .overflow-x-auto {
+        overflow: visible !important;
+      }
+      .report-page table {
+        min-width: 0 !important;
+        width: 100% !important;
+        table-layout: auto !important;
+        font-size: 8pt !important;
+        border-collapse: collapse !important;
+      }
+      .report-page th,
+      .report-page td {
+        padding: 4px 6px !important;
+      }
+      /* High-contrast print rules so iPad Safari never renders pale/invisible text when stripping dark backgrounds */
+      .report-page .bg-obsidian-950,
+      .report-page .bg-slate-800 {
+        background-color: #f1f5f9 !important;
+        box-shadow: inset 0 0 0 1000px #f1f5f9 !important;
+        color: #0f172a !important;
+        border: 1px solid #64748b !important;
+      }
+      .report-page thead.bg-obsidian-950 th,
+      .report-page thead.bg-slate-800 th {
+        background-color: #e2e8f0 !important;
+        box-shadow: inset 0 0 0 1000px #e2e8f0 !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        border-bottom: 1.5px solid #475569 !important;
+      }
+      .report-page .text-champagne-400,
+      .report-page .text-champagne-600 {
+        color: #92400e !important;
+        font-weight: 800 !important;
+      }
+      .report-page .text-slate-400,
+      .report-page .text-slate-500 {
+        color: #334155 !important;
+      }
+      .report-page .bg-emerald-800 {
+        background-color: #d1fae5 !important;
+        box-shadow: inset 0 0 0 1000px #d1fae5 !important;
+        color: #065f46 !important;
+        border: 1px solid #059669 !important;
+      }
+      .report-page .bg-amber-500 {
+        background-color: #fef3c7 !important;
+        box-shadow: inset 0 0 0 1000px #fef3c7 !important;
+        color: #92400e !important;
+        border: 1px solid #d97706 !important;
       }
     }
   </style>
@@ -376,11 +516,11 @@
             <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             ล้างข้อมูล
           </button>
-          <button id="btn-export-json" class="px-2.5 py-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-900 text-slate-300 border border-slate-700/80 transition flex items-center gap-1 font-medium">
+          <button id="btn-export-json" class="hidden px-2.5 py-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-900 text-slate-300 border border-slate-700/80 transition flex items-center gap-1 font-medium" title="เฉพาะแอดมิน: ส่งออกไฟล์ JSON">
             <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             ส่งออก JSON
           </button>
-          <label class="px-2.5 py-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-900 text-slate-300 border border-slate-700/80 transition flex items-center gap-1 font-medium cursor-pointer">
+          <label id="label-import-json" class="hidden px-2.5 py-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-900 text-slate-300 border border-slate-700/80 transition flex items-center gap-1 font-medium cursor-pointer" title="เฉพาะแอดมิน: นำเข้าไฟล์ JSON">
             <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             นำเข้า JSON
             <input type="file" id="input-import-json" accept=".json" class="hidden">
@@ -431,34 +571,7 @@
     </div>
   </header>
 
-  <!-- Floating Bottom Dock Navigation (Always follows user scroll!) -->
-  <div id="floating-bottom-nav" class="fixed bottom-0 left-0 right-0 z-50 bg-obsidian-950/95 backdrop-blur-md border-t border-champagne-500/30 shadow-2xl no-print">
-    <div class="max-w-7xl mx-auto px-3 py-2 flex items-center justify-between gap-1 overflow-x-auto custom-scrollbar">
-      <div class="flex items-center space-x-1 sm:space-x-1.5 mx-auto">
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold transition flex items-center gap-1.5 bg-champagne-500 text-obsidian-950 shadow-sm shrink-0" data-tab="tab-pyramid">
-          <span>🔺</span><span>0. สามเหลี่ยมการเงิน</span>
-        </button>
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-profile">
-          <span>01</span><span>ข้อมูลลูกค้า</span>
-        </button>
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-cashflow">
-          <span>02</span><span>รายรับ-รายจ่าย</span>
-        </button>
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-networth">
-          <span>03</span><span>สินทรัพย์-หนี้สิน</span>
-        </button>
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-insurance">
-          <span>04</span><span>สรุปกรมธรรม์</span>
-        </button>
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-tax">
-          <span>05</span><span>วางแผนภาษี</span>
-        </button>
-        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-report">
-          <span>06</span><span>รายงาน PDF (5 หน้า)</span>
-        </button>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Main Workspace Container -->
   <main id="main-workspace" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full transition-all">
@@ -2068,17 +2181,43 @@
             </div>
           </div>
 
-          <!-- Professional Financial Pyramid Summary (Modeled after PlanTastic Video) -->
-          <div class="p-5 rounded-2xl border-2 border-obsidian-900 bg-gradient-to-b from-slate-50 to-white">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 border-b border-slate-200 pb-2.5">
+          <!-- Professional Financial Pyramid Summary (With Vector SVG Pyramid for Crisp PDF Export) -->
+          <div class="p-4 rounded-2xl border-2 border-obsidian-900 bg-gradient-to-b from-slate-50 to-white">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5 border-b border-slate-200 pb-2">
               <div>
-                <span class="text-[10px] font-mono uppercase tracking-widest text-champagne-600 font-bold block">COMPLETE FINANCIAL PYRAMID ARCHITECTURE</span>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-amber-800 font-bold block">COMPLETE FINANCIAL PYRAMID ARCHITECTURE</span>
                 <h3 class="text-sm sm:text-base font-extrabold text-obsidian-950">สรุปโครงสร้างสามเหลี่ยมทางการเงิน (สร้างฐานให้มั่นคง ก่อนต่อยอดความมั่งคั่ง)</h3>
               </div>
-              <span class="text-[11px] font-semibold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">วางแผนจากล่างขึ้นบน (Bottom-Up Strategy)</span>
+              <span class="text-[11px] font-semibold text-emerald-900 bg-emerald-100 border border-emerald-300 px-3 py-0.5 rounded-full shrink-0">▲ วางแผนจากล่างขึ้นบน (Bottom-Up Strategy)</span>
             </div>
 
-            <div class="space-y-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+              <!-- Vector SVG Financial Pyramid (100% preserved in iPad Safari Print-to-PDF) -->
+              <div class="md:col-span-5 flex justify-center">
+                <svg viewBox="0 0 360 220" class="w-full max-w-[300px] h-auto select-none rounded-xl">
+                  <rect x="0" y="0" width="360" height="220" rx="12" fill="#0b1222"/>
+                  <!-- Tier 3 Apex -->
+                  <polygon points="180,10 245,76 115,76" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
+                  <text x="180" y="42" text-anchor="middle" fill="#fde047" font-size="8.5" font-weight="bold">▲ ชั้นที่ 3: ลงทุนต่อยอด</text>
+                  <text x="180" y="56" text-anchor="middle" fill="#ffffff" font-size="7.5">หุ้น • กองทุน • ทอง • อสังหาฯ</text>
+                  <text id="rep-svg-pyr3" x="180" y="69" text-anchor="middle" fill="#bae6fd" font-size="8" font-weight="bold">พอร์ตลงทุน 950,000 ฿</text>
+
+                  <!-- Tier 2 Middle -->
+                  <polygon points="111,82 249,82 292,142 68,142" fill="#d97706" stroke="#fde68a" stroke-width="1.5"/>
+                  <text x="180" y="101" text-anchor="middle" fill="#ffffff" font-size="8.8" font-weight="bold">◼ ชั้นที่ 2: ออมสะสม 3 ระยะ (สั้น•กลาง•ยาว)</text>
+                  <text x="180" y="116" text-anchor="middle" fill="#fffbeb" font-size="7.5">แผนเกษียณ &amp; ทุนลูก • บำนาญ • PVD/RMF</text>
+                  <text id="rep-svg-pyr2" x="180" y="133" text-anchor="middle" fill="#fef08a" font-size="8.2" font-weight="bold">ออม 120,000 ฿/ปี (9.6%)</text>
+
+                  <!-- Tier 1 Base -->
+                  <polygon points="64,148 296,148 340,210 20,210" fill="#059669" stroke="#6ee7b7" stroke-width="1.5"/>
+                  <text x="180" y="168" text-anchor="middle" fill="#ffffff" font-size="9.2" font-weight="bold">⬛ ชั้นที่ 1: ฐานราก (สำรองฉุกเฉิน + ประกันภัย)</text>
+                  <text x="180" y="184" text-anchor="middle" fill="#d1fae5" font-size="7.5">สภาพคล่อง 3-6 ด. • สุขภาพ • โรคร้าย • ทุนชีวิต</text>
+                  <text id="rep-svg-pyr1" x="180" y="201" text-anchor="middle" fill="#fde047" font-size="8.5" font-weight="bold">สำรอง 5.7 ด. | ทุนชีวิต 1.10M ฿</text>
+                </svg>
+              </div>
+
+              <!-- 3-Tier Detailed Summary Cards -->
+              <div class="md:col-span-7 space-y-2 text-xs">
               <!-- Tier 3 Top -->
               <div class="p-3.5 rounded-xl bg-sky-50/90 border border-sky-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
@@ -2114,6 +2253,7 @@
                   <span id="rep-pyr-tier1-status" class="text-[10px] font-bold text-rose-700">ยังขาดทุนประกันชีวิตคุ้มครองครอบครัว</span>
                 </div>
               </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2136,11 +2276,11 @@
               <span>Infographic สัดส่วนการจัดสรรกระแสเงินสดต่อปี (Income Allocation Flow)</span>
               <span id="rep-infographic-cf-total" class="num-tabular text-emerald-700">รายได้รวม 1,256,000 ฿</span>
             </div>
-            <div class="w-full h-5 rounded-lg overflow-hidden flex bg-slate-200 p-0.5 gap-0.5">
-              <div id="rep-bar-cf-fixed" class="bg-rose-600 h-full rounded-l flex items-center justify-center text-[9px] font-bold text-white" style="width: 37%">คงที่/หนี้ 37%</div>
-              <div id="rep-bar-cf-var" class="bg-amber-500 h-full flex items-center justify-center text-[9px] font-bold text-obsidian-950" style="width: 30%">ผันแปร 30%</div>
-              <div id="rep-bar-cf-save" class="bg-sky-600 h-full flex items-center justify-center text-[9px] font-bold text-white" style="width: 10%">ออม 10%</div>
-              <div id="rep-bar-cf-surplus" class="bg-emerald-600 h-full rounded-r flex items-center justify-center text-[9px] font-bold text-white" style="width: 23%">คงเหลือ 23%</div>
+            <div class="w-full h-6 rounded-lg overflow-hidden flex bg-slate-200 p-0.5 gap-0.5 border border-slate-300">
+              <div id="rep-bar-cf-fixed" class="bg-rose-600 h-full rounded-l flex items-center justify-center text-[9px] font-bold text-white border border-rose-700" style="width: 37%; box-shadow: inset 0 0 0 100px #e11d48;">คงที่/หนี้ 37%</div>
+              <div id="rep-bar-cf-var" class="bg-amber-500 h-full flex items-center justify-center text-[9px] font-bold text-obsidian-950 border border-amber-600" style="width: 30%; box-shadow: inset 0 0 0 100px #f59e0b;">ผันแปร 30%</div>
+              <div id="rep-bar-cf-save" class="bg-sky-600 h-full flex items-center justify-center text-[9px] font-bold text-white border border-sky-700" style="width: 10%; box-shadow: inset 0 0 0 100px #0284c7;">ออม 10%</div>
+              <div id="rep-bar-cf-surplus" class="bg-emerald-600 h-full rounded-r flex items-center justify-center text-[9px] font-bold text-white border border-emerald-700" style="width: 23%; box-shadow: inset 0 0 0 100px #059669;">คงเหลือ 23%</div>
             </div>
           </div>
 
@@ -2439,6 +2579,36 @@
 
   </main>
 
+  <!-- Static Bottom Footer Navigation (Does NOT float or overlap content while scrolling) -->
+  <footer id="floating-bottom-nav" class="relative w-full mt-8 bg-obsidian-950 border-t border-champagne-500/30 shadow-inner no-print">
+    <div class="max-w-7xl mx-auto px-3 py-3 flex flex-col sm:flex-row items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
+      <span class="text-[11px] text-slate-400 font-medium hidden md:inline">เปลี่ยนหน้าโมดูลวางแผนการเงิน:</span>
+      <div class="flex items-center space-x-1 sm:space-x-1.5 mx-auto md:mx-0">
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold transition flex items-center gap-1.5 bg-champagne-500 text-obsidian-950 shadow-sm shrink-0" data-tab="tab-pyramid">
+          <span>🔺</span><span>0. สามเหลี่ยมการเงิน</span>
+        </button>
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-profile">
+          <span>01</span><span>ข้อมูลลูกค้า</span>
+        </button>
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-cashflow">
+          <span>02</span><span>รายรับ-รายจ่าย</span>
+        </button>
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-networth">
+          <span>03</span><span>สินทรัพย์-หนี้สิน</span>
+        </button>
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-insurance">
+          <span>04</span><span>สรุปกรมธรรม์</span>
+        </button>
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-tax">
+          <span>05</span><span>วางแผนภาษี</span>
+        </button>
+        <button class="dock-tab px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 shrink-0" data-tab="tab-report">
+          <span>06</span><span>รายงาน PDF (5 หน้า)</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
   <!-- Modal for Adding / Editing Policy -->
   <div id="modal-policy" class="fixed inset-0 bg-obsidian-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden no-print">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -2534,20 +2704,21 @@
         </button>
       </div>
 
-      <!-- VIEW A: UNAUTHENTICATED (SIGN UP / LOGIN) -->
+      <!-- VIEW A: UNAUTHENTICATED (PASSWORDLESS SIGN UP / LOGIN + GOOGLE AUTH) -->
       <div id="auth-unauthenticated-view" class="space-y-4">
         <!-- Mode Switcher Tabs -->
         <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-obsidian-950 border border-slate-800">
-          <button type="button" id="btn-auth-tab-login" class="py-2 px-3 rounded-lg text-xs font-bold bg-emerald-400 text-obsidian-950 shadow-sm transition">
-            🔑 เข้าสู่ระบบ (มีไอดีแล้ว)
-          </button>
-          <button type="button" id="btn-auth-tab-signup" class="py-2 px-3 rounded-lg text-xs font-medium text-slate-300 hover:text-white transition">
+          <button type="button" id="btn-auth-tab-signup" class="py-2 px-3 rounded-lg text-xs font-bold bg-champagne-500 text-obsidian-950 shadow-sm transition">
             📝 สมัครสมาชิกใหม่
+          </button>
+          <button type="button" id="btn-auth-tab-login" class="py-2 px-3 rounded-lg text-xs font-medium text-slate-300 hover:text-white transition">
+            🔑 เข้าสู่ระบบ (มีไอดีแล้ว)
           </button>
         </div>
 
-        <!-- Quick Social Login (Google) -->
+        <!-- Quick Social Login (Google Identity Services + Instant Google Link) -->
         <div class="space-y-2">
+          <div id="g-id-signin-btn-container" class="hidden flex justify-center"></div>
           <button type="button" id="btn-google-login" class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs shadow-sm transition flex items-center justify-center gap-2.5">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
               <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
@@ -2558,62 +2729,73 @@
             <span>ดำเนินการต่อด้วยบัญชี Google (Google Sign-In)</span>
           </button>
 
-          <!-- Inline Google Account Quick Prompt (Hidden unless clicked in standalone/demo mode) -->
-          <div id="google-quick-box" class="hidden p-3.5 rounded-xl bg-obsidian-950 border border-sky-500/40 space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-sky-300">เลือกหรือกรอกอีเมลบัญชี Google ของคุณ</span>
-              <span class="text-[10px] text-slate-400">Google OAuth 2.0</span>
+          <!-- Clean Passwordless Google Account Linking Box -->
+          <div id="google-quick-box" class="hidden p-4 rounded-2xl bg-obsidian-950 border border-sky-500/40 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                <span>🔗</span><span>เชื่อมบัญชี Google เข้าใช้งานทันที (ไม่ต้องตั้งรหัสผ่าน)</span>
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">Google Link</span>
             </div>
-            <input type="hidden" id="google-sim-name" value="">
-            <input type="hidden" id="google-sim-phone" value="">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">อีเมล Google ของคุณ (Gmail) <span class="text-rose-400">*</span></label>
+                <input type="email" id="google-sim-email" class="w-full px-3 py-2 rounded-xl bg-obsidian-800 border border-slate-700 focus:border-sky-400 text-xs text-white outline-none" placeholder="เช่น yourname@gmail.com">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">ชื่อ - นามสกุล / ชื่อเล่น</label>
+                <input type="text" id="google-sim-name" class="w-full px-3 py-2 rounded-xl bg-obsidian-800 border border-slate-700 focus:border-sky-400 text-xs text-white outline-none" placeholder="เช่น คุณสมชาย">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+                <input type="tel" id="google-sim-phone" class="w-full px-3 py-2 rounded-xl bg-obsidian-800 border border-slate-700 focus:border-sky-400 text-xs text-white num-tabular outline-none" placeholder="เช่น 081-234-5678">
+              </div>
+            </div>
             <input type="hidden" id="google-sim-line" value="">
-            <div>
-              <input type="email" id="google-sim-email" class="w-full px-3 py-2 rounded-lg bg-obsidian-800 border border-slate-700 text-xs text-white" placeholder="yourname@gmail.com" value="member.vip@gmail.com">
-            </div>
-            <button type="button" id="btn-confirm-google-sim" class="w-full py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-obsidian-950 font-bold text-xs transition">
+            <button type="button" id="btn-confirm-google-sim" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-obsidian-950 font-extrabold text-xs shadow-md transition">
               ✓ ยืนยันเข้าสู่ระบบด้วย Google &amp; เริ่มใช้งานทันที
             </button>
           </div>
         </div>
 
-        <div class="flex items-center gap-3 text-[10px] text-slate-500 uppercase tracking-widest">
+        <div class="flex items-center gap-3 text-[10px] text-slate-400 uppercase tracking-widest">
           <div class="h-px flex-1 bg-slate-800"></div>
-          <span>หรือใช้อีเมลและรหัสผ่าน</span>
+          <span>หรือลงทะเบียนด่วน (ไม่ต้องใช้รหัสผ่าน)</span>
           <div class="h-px flex-1 bg-slate-800"></div>
         </div>
 
-        <!-- FORM 1: SIGN UP (PURE ACCOUNT REGISTRATION — NO CLIENT NAME FIELD) -->
-        <form id="form-auth-signup" class="space-y-3 hidden">
-          <!-- Hidden compatibility inputs -->
-          <input type="hidden" id="signup-name" value="">
+        <!-- FORM 1: PASSWORDLESS SIGN UP (NO PASSWORD REQUIRED) -->
+        <form id="form-auth-signup" class="space-y-3">
+          <!-- Hidden password input preserved for DOM compatibility -->
+          <input type="hidden" id="signup-password" value="nopass">
           <input type="hidden" id="signup-age" value="35">
-          <input type="checkbox" id="signup-prefill-check" class="hidden">
+          <input type="checkbox" id="signup-prefill-check" checked class="hidden">
 
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">ไอดีผู้ใช้งาน หรือ อีเมลสำหรับเข้าสู่ระบบ (User ID / Email) <span class="text-rose-400">*</span></label>
-            <input type="text" id="signup-email" required class="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="เช่น yourname@email.com หรือตั้งไอดีผู้ใช้งาน">
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">ตั้งรหัสผ่าน (อย่างน้อย 6 ตัวอักษร) <span class="text-rose-400">*</span></label>
-            <input type="password" id="signup-password" required minlength="6" class="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="••••••••">
+            <label class="block text-[11px] font-semibold text-slate-200 mb-1">ชื่อ - นามสกุล หรือ ชื่อเล่น <span class="text-rose-400">*</span></label>
+            <input type="text" id="signup-name" required class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="เช่น คุณสมชาย มั่นคงดี">
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">เบอร์โทรศัพท์มือถือ <span class="text-rose-400">*</span></label>
-              <input type="text" id="signup-phone" required class="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white num-tabular outline-none" placeholder="เช่น 081-234-5678">
+              <label class="block text-[11px] font-semibold text-slate-200 mb-1">เบอร์โทรศัพท์มือถือ <span class="text-rose-400">*</span></label>
+              <input type="tel" id="signup-phone" required class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white num-tabular outline-none" placeholder="เช่น 081-234-5678">
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">LINE ID (ถ้ามี)</label>
-              <input type="text" id="signup-line" class="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="เช่น @yourline">
+              <label class="block text-[11px] font-semibold text-slate-200 mb-1">LINE ID (ถ้ามี)</label>
+              <input type="text" id="signup-line" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="เช่น @yourline">
             </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-200 mb-1">อีเมล หรือ ตั้งไอดีผู้ใช้งาน (ใช้เข้าสู่ระบบครั้งถัดไป — ไม่ต้องตั้งรหัสผ่าน) <span class="text-rose-400">*</span></label>
+            <input type="text" id="signup-email" required class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="เช่น yourname@gmail.com หรือไอดีผู้ใช้งาน">
           </div>
 
           <div class="space-y-1.5 pt-1 text-[11px] text-slate-300">
             <label class="flex items-start gap-2 cursor-pointer">
               <input type="checkbox" id="signup-pdpa-check" required checked class="mt-0.5 rounded border-slate-700 text-champagne-500">
-              <span class="text-slate-400">ยินยอมสมัครสมาชิกเพื่อเข้าใช้งานระบบและบันทึกข้อมูลแผนการเงินตามมาตรฐาน PDPA</span>
+              <span class="text-slate-400">ยินยอมสมัครสมาชิกเพื่อเข้าใช้งานระบบและบันทึกข้อมูลแผนการเงินตามมาตรฐาน PDPA (ไม่ต้องใช้รหัสผ่าน)</span>
             </label>
           </div>
 
@@ -2622,18 +2804,19 @@
           </button>
         </form>
 
-        <!-- FORM 2: LOGIN (EXISTING MEMBER & ADMIN) -->
-        <form id="form-auth-login" class="space-y-3">
+        <!-- FORM 2: PASSWORDLESS MEMBER LOGIN (& PASSWORD-PROTECTED ADMIN) -->
+        <form id="form-auth-login" class="space-y-3 hidden">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">ไอดีผู้ใช้งาน หรือ อีเมลสมาชิก (User ID / Email) <span class="text-rose-400">*</span></label>
-            <input type="text" id="login-email" required class="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="กรอกไอดีผู้ใช้งาน หรือ อีเมลของคุณ">
+            <label class="block text-[11px] font-semibold text-slate-200 mb-1">กรอกอีเมล / เบอร์โทรศัพท์ / ไอดีที่ลงทะเบียนไว้ <span class="text-rose-400">*</span></label>
+            <input type="text" id="login-email" required class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-emerald-400 text-xs text-white outline-none" placeholder="กรอกอีเมล, เบอร์โทรศัพท์ หรือ ไอดีของคุณ">
           </div>
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">รหัสผ่าน (Password) <span class="text-rose-400">*</span></label>
-            <input type="password" id="login-password" required class="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-slate-700 focus:border-champagne-400 text-xs text-white outline-none" placeholder="••••••••">
+          <div id="login-password-wrap" class="hidden">
+            <label class="block text-[11px] font-semibold text-champagne-300 mb-1">รหัสผ่านผู้ดูแลระบบ (Admin Password) <span class="text-rose-400">*</span></label>
+            <input type="password" id="login-password" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-champagne-500/50 focus:border-champagne-400 text-xs text-white outline-none" placeholder="กรอกรหัสผ่าน Admin">
           </div>
-          <div class="p-2.5 rounded-xl bg-obsidian-950/90 border border-slate-800 text-[11px] text-slate-400">
-            🔒 <strong class="text-champagne-300">ระบบรักษาความปลอดภัย:</strong> กรุณาเข้าสู่ระบบด้วยไอดีหรืออีเมลที่ลงทะเบียนไว้เพื่อเข้าใช้งานเครื่องมือวางแผนการเงิน
+          <div class="p-2.5 rounded-xl bg-obsidian-950/90 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between gap-2">
+            <span>✨ <strong>สมาชิกทั่วไป:</strong> กรอกเฉพาะอีเมลหรือเบอร์โทรเพื่อเข้าใช้งานได้ทันที (ไม่ต้องใส่รหัสผ่าน)</span>
+            <button type="button" id="btn-toggle-admin-pass" class="text-[10px] text-champagne-400 hover:underline shrink-0 font-semibold">สำหรับแอดมิน</button>
           </div>
           <button type="submit" id="btn-submit-login" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-obsidian-950 font-extrabold text-xs shadow-lg transition">
             🔓 เข้าสู่ระบบ &amp; เริ่มใช้งานทันที
@@ -2780,6 +2963,12 @@
             <input type="url" id="cloud-webhook-url" class="w-full px-3 py-2 rounded-xl wealth-input text-xs font-mono" placeholder="https://script.google.com/macros/s/.../exec">
             <span class="text-[10px] text-slate-500 mt-1 block">เมื่อมีลูกค้าสมัครหรือกดบันทึกแผน ระบบจะส่ง JSON ไปยัง URL นี้อัตโนมัติ</span>
           </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-sky-900 mb-1">🌐 Google OAuth Client ID (สำหรับเปิดปุ่ม Google Sign-In ของจริงบนเว็บ GitHub Pages)</label>
+          <input type="text" id="cloud-google-client-id" class="w-full px-3 py-2 rounded-xl wealth-input text-xs font-mono" placeholder="เช่น 1234567890-abcdefg.apps.googleusercontent.com (เว้นว่างไว้เพื่อใช้โหมดเชื่อม Gmail ทันที)">
+          <span class="text-[10px] text-slate-500 mt-1 block">หากใส่ Google Client ID จาก Google Cloud Console ระบบจะแสดงปุ่ม Google One-Tap / OAuth Popup ของแท้โดยอัตโนมัติ</span>
         </div>
 
         <div>
@@ -3715,12 +3904,15 @@
       setElText('sign-advisor-contact-line', `เบอร์โทรติดต่อ: ${advTel} • Line ID: ${advLine}`);
       document.getElementById('rep-overall-score-pill').textContent = `Health Score: ${data.totalHealthScore} / 100`;
 
-      // Page 1 Pyramid Summary Values
+      // Page 1 Pyramid Summary Values & Inline SVG Pyramid
       setElText('rep-pyr-tier3-val', fmt(data.investmentAssets) + ' ฿');
       setElText('rep-pyr-tier2-val', `ออม ${fmt(data.annualSavings)} ฿/ปี`);
       setElText('rep-pyr-tier2-status', `อัตราออม ${data.savingsRatio.toFixed(1)}% ของรายได้`);
       setElText('rep-pyr-tier1-val', `สำรอง ${data.emergencyMonths.toFixed(1)} ด. | ทุนชีวิต ${fmtCompact(data.existingLifeSum)}`);
       setElText('rep-pyr-tier1-status', data.gapLife > 0 ? `ควรเสริมทุนประกันชีวิตอีก ${fmt(data.gapLife)} ฿` : '✓ ฐานความมั่นคงแข็งแรง');
+      setElText('rep-svg-pyr3', `พอร์ตลงทุน ${fmt(data.investmentAssets)} ฿`);
+      setElText('rep-svg-pyr2', `ออม ${fmt(data.annualSavings)} ฿/ปี (${data.savingsRatio.toFixed(1)}%)`);
+      setElText('rep-svg-pyr1', `สำรอง ${data.emergencyMonths.toFixed(1)} ด. | ทุนชีวิต ${fmtCompact(data.existingLifeSum)} ฿`);
 
       // Page 2 Emergency Fund Details
       setElText('rep-emerg-monthly-exp', fmt(data.monthlyExpenses) + ' ฿/เดือน');
@@ -4285,14 +4477,26 @@
         reader.readAsText(file);
       });
 
-      // Print Report Handler
+      // Print Report Handler (Automatically strips iPad/Mobile simulator borders before printing)
       const printHandler = () => {
         if (!consumeMonthlyQuota('พิมพ์รายงาน PDF 5 หน้า')) return;
+        const mainWs = document.getElementById('main-workspace');
+        const wasIpad = mainWs && mainWs.classList.contains('sim-ipad');
+        const wasMobile = mainWs && mainWs.classList.contains('sim-mobile');
+        if (mainWs) {
+          mainWs.classList.remove('sim-ipad', 'sim-mobile');
+        }
         recalculateAll();
         const tabs = document.querySelectorAll('.nav-tab');
         const repBtn = Array.from(tabs).find(t => t.getAttribute('data-tab') === 'tab-report');
         if (repBtn) repBtn.click();
-        setTimeout(() => window.print(), 300);
+        setTimeout(() => {
+          window.print();
+          if (mainWs) {
+            if (wasIpad) mainWs.classList.add('sim-ipad');
+            if (wasMobile) mainWs.classList.add('sim-mobile');
+          }
+        }, 350);
       };
       document.getElementById('btn-print-top').addEventListener('click', printHandler);
       document.getElementById('btn-print-report').addEventListener('click', printHandler);
@@ -4717,9 +4921,11 @@
 
       enforceMandatoryAuthLock();
       const adminBtn = document.getElementById('btn-open-admin-cloud');
+      const exportJsonBtn = document.getElementById('btn-export-json');
+      const importJsonLbl = document.getElementById('label-import-json');
       if (session && session.email) {
-        const currentUser = users.find(u => u.email.toLowerCase() === session.email.toLowerCase()) || session;
-        const isAdmin = currentUser.email.toLowerCase() === 'admin132611' || currentUser.role === 'admin';
+        const currentUser = users.find(u => (u.email || '').toLowerCase() === session.email.toLowerCase()) || session;
+        const isAdmin = (currentUser.email || '').toLowerCase() === 'admin132611' || currentUser.role === 'admin';
         if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
         if (label) label.textContent = (isAdmin ? '👑 ' : '👤 ') + (currentUser.name || currentUser.email);
         if (unauthView) unauthView.classList.add('hidden');
@@ -4727,6 +4933,14 @@
         if (adminBtn) {
           if (isAdmin) adminBtn.classList.remove('hidden');
           else adminBtn.classList.add('hidden');
+        }
+        if (exportJsonBtn) {
+          if (isAdmin) exportJsonBtn.classList.remove('hidden');
+          else exportJsonBtn.classList.add('hidden');
+        }
+        if (importJsonLbl) {
+          if (isAdmin) importJsonLbl.classList.remove('hidden');
+          else importJsonLbl.classList.add('hidden');
         }
 
         setElText('member-profile-name', currentUser.name || '-');
@@ -4740,6 +4954,8 @@
         if (unauthView) unauthView.classList.remove('hidden');
         if (authView) authView.classList.add('hidden');
         if (adminBtn) adminBtn.classList.add('hidden');
+        if (exportJsonBtn) exportJsonBtn.classList.add('hidden');
+        if (importJsonLbl) importJsonLbl.classList.add('hidden');
       }
     }
 
@@ -4886,15 +5102,17 @@
       }
       ensureMasterAdminAccount();
 
-      const cfg = safeGetStorage(STORAGE_CONFIG_KEY, { gateMode: 'strict', webhookUrl: '', firebaseJson: '', monthlyQuota: 10, proCode: 'BOPRO999' });
+      const cfg = safeGetStorage(STORAGE_CONFIG_KEY, { gateMode: 'strict', webhookUrl: '', googleClientId: '', firebaseJson: '', monthlyQuota: 10, proCode: 'BOPRO999' });
       cfg.gateMode = 'strict';
       const gateModeSelect = document.getElementById('cloud-gate-mode');
       const webhookInput = document.getElementById('cloud-webhook-url');
+      const googleCidInput = document.getElementById('cloud-google-client-id');
       const fbInput = document.getElementById('cloud-firebase-json');
       const quotaInput = document.getElementById('cloud-monthly-quota');
       const proCodeInput = document.getElementById('cloud-pro-code');
       if (gateModeSelect) gateModeSelect.value = 'strict';
       if (webhookInput) webhookInput.value = cfg.webhookUrl || '';
+      if (googleCidInput) googleCidInput.value = cfg.googleClientId || '';
       if (fbInput) fbInput.value = cfg.firebaseJson || '';
       if (quotaInput) quotaInput.value = cfg.monthlyQuota || 10;
       if (proCodeInput) proCodeInput.value = cfg.proCode || 'BOPRO999';
@@ -4955,33 +5173,28 @@
         formSignup.classList.add('hidden');
       });
 
-      // Google Login Handler
-      document.getElementById('btn-google-login').addEventListener('click', () => {
-        const quickBox = document.getElementById('google-quick-box');
-        quickBox.classList.toggle('hidden');
-      });
-
-      document.getElementById('btn-confirm-google-sim').addEventListener('click', () => {
-        const gEmail = document.getElementById('google-sim-email').value.trim() || 'member.vip@gmail.com';
-        const gName = document.getElementById('google-sim-name').value.trim() || gEmail.split('@')[0];
-        const gPhone = document.getElementById('google-sim-phone').value.trim() || '-';
-        const gLine = document.getElementById('google-sim-line').value.trim() || '-';
-
-        const users = safeGetStorage(STORAGE_USERS_KEY, getDefaultRegisteredUsers());
-        let user = users.find(u => u.email.toLowerCase() === gEmail.toLowerCase());
+      // Helper to complete Google Login (from real Google JWT or Quick Link box)
+      function completeGoogleAuth(gEmail, gName, gPhone, gLine, providerLabel = 'Google') {
+        const users = ensureMasterAdminAccount();
+        let user = users.find(u => (u.email || '').toLowerCase() === gEmail.toLowerCase());
         const nowStr = new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
 
         if (!user) {
+          if (gName) appData.profile.name = gName;
           populateFormInputs();
           user = {
             id: 'USR-' + Date.now().toString().slice(-4),
-            name: gName,
+            name: gName || gEmail.split('@')[0],
             age: appData.profile.age || 35,
-            phone: gPhone,
-            lineId: gLine,
+            phone: gPhone || '-',
+            lineId: gLine || '-',
             email: gEmail,
-            password: 'google-oauth-user',
-            provider: 'Google',
+            password: 'nopass-google',
+            role: 'member',
+            provider: providerLabel,
+            planTier: 'free',
+            quotaUsed: 0,
+            quotaMonth: getCurrentYearMonth(),
             updatedAt: nowStr,
             summary: computeCurrentSummarySnapshot(),
             planData: JSON.parse(JSON.stringify(appData))
@@ -4994,15 +5207,70 @@
           populateFormInputs();
         }
 
-        safeSetStorage(STORAGE_SESSION_KEY, { email: user.email, name: user.name });
+        safeSetStorage(STORAGE_SESSION_KEY, { email: user.email, name: user.name, role: user.role || 'member' });
         updateHeaderAuthUI();
+        updateQuotaUI();
         renderAdminLeadsTable();
         document.getElementById('google-quick-box').classList.add('hidden');
         document.getElementById('modal-auth-gate').classList.add('hidden');
-        showToast(`เข้าสู่ระบบด้วยบัญชี Google (${user.name}) สำเร็จ!`, 'success');
+        showToast(`เชื่อมบัญชี Google (${user.name}) สำเร็จ! เข้าใช้งานได้ทันที`, 'success');
+      }
+
+      // Initialize Real Google Identity Services if Google Client ID is configured
+      function tryInitRealGoogleGSI() {
+        const curCfg = safeGetStorage(STORAGE_CONFIG_KEY, {});
+        const clientId = (curCfg.googleClientId || '').trim();
+        if (clientId && window.google && window.google.accounts && window.google.accounts.id) {
+          try {
+            window.google.accounts.id.initialize({
+              client_id: clientId,
+              callback: (response) => {
+                if (response && response.credential) {
+                  const base64Url = response.credential.split('.')[1];
+                  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                  const payload = JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+                  completeGoogleAuth(payload.email, payload.name || payload.given_name, '-', '-', 'Google OAuth');
+                }
+              }
+            });
+            const btnContainer = document.getElementById('g-id-signin-btn-container');
+            if (btnContainer) {
+              btnContainer.classList.remove('hidden');
+              window.google.accounts.id.renderButton(btnContainer, { theme: 'outline', size: 'large', width: 340, text: 'continue_with' });
+            }
+          } catch (e) {}
+        }
+      }
+      setTimeout(tryInitRealGoogleGSI, 600);
+
+      // Google Login Button Handler
+      document.getElementById('btn-google-login').addEventListener('click', () => {
+        const curCfg = safeGetStorage(STORAGE_CONFIG_KEY, {});
+        const clientId = (curCfg.googleClientId || '').trim();
+        if (clientId && window.google && window.google.accounts && window.google.accounts.id) {
+          window.google.accounts.id.prompt();
+          return;
+        }
+        const quickBox = document.getElementById('google-quick-box');
+        quickBox.classList.toggle('hidden');
+        const emailInp = document.getElementById('google-sim-email');
+        if (emailInp && !quickBox.classList.contains('hidden')) emailInp.focus();
       });
 
-      // Sign-Up Form Submit
+      document.getElementById('btn-confirm-google-sim').addEventListener('click', () => {
+        const gEmail = document.getElementById('google-sim-email').value.trim();
+        const gName = document.getElementById('google-sim-name').value.trim();
+        const gPhone = document.getElementById('google-sim-phone').value.trim();
+        const gLine = document.getElementById('google-sim-line').value.trim();
+        if (!gEmail || !gEmail.includes('@')) {
+          showToast('กรุณากรอกอีเมล Google (เช่น yourname@gmail.com)', 'warning');
+          document.getElementById('google-sim-email').focus();
+          return;
+        }
+        completeGoogleAuth(gEmail, gName || gEmail.split('@')[0], gPhone || '-', gLine || '-', 'Google Link');
+      });
+
+      // Passwordless Sign-Up Form Submit (No password required! Auto-logs in existing members too)
       formSignup.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('signup-email').value.trim();
@@ -5011,33 +5279,52 @@
         const age = parseInt(document.getElementById('signup-age').value) || 35;
         const phone = document.getElementById('signup-phone').value.trim();
         const lineId = document.getElementById('signup-line').value.trim();
-        const password = document.getElementById('signup-password').value;
-        const shouldPrefill = false;
 
-        const users = safeGetStorage(STORAGE_USERS_KEY, getDefaultRegisteredUsers());
-        if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-          showToast('อีเมลนี้เป็นสมาชิกอยู่แล้ว กรุณากดแท็บ "เข้าสู่ระบบสมาชิก"', 'warning');
+        if (email.toLowerCase() === 'admin132611') {
+          showToast('ไอดี Admin132611 กรุณาเข้าสู่ระบบที่แท็บ "เข้าสู่ระบบ" พร้อมรหัสผ่านแอดมิน', 'warning');
           tabLoginBtn.click();
-          document.getElementById('login-email').value = email;
+          document.getElementById('login-email').value = 'Admin132611';
+          document.getElementById('login-password-wrap').classList.remove('hidden');
           return;
         }
 
-        if (shouldPrefill) {
-          appData.profile.name = name;
-          appData.profile.age = age;
-          populateFormInputs();
+        const users = ensureMasterAdminAccount();
+        const existing = users.find(u =>
+          (u.email || '').toLowerCase() === email.toLowerCase() ||
+          (phone && phone !== '-' && (u.phone || '').replace(/\D/g, '') === phone.replace(/\D/g, '') && phone.replace(/\D/g, '').length >= 9)
+        );
+
+        if (existing && (existing.email || '').toLowerCase() !== 'admin132611') {
+          // Seamless login if member already registered
+          safeSetStorage(STORAGE_SESSION_KEY, { email: existing.email, name: existing.name, role: existing.role || 'member' });
+          if (existing.planData) {
+            appData = JSON.parse(JSON.stringify(existing.planData));
+            populateFormInputs();
+          }
+          updateHeaderAuthUI();
+          updateQuotaUI();
+          document.getElementById('modal-auth-gate').classList.add('hidden');
+          showToast(`ยินดีต้อนรับกลับ ${existing.name}! โหลดแฟ้มข้อมูลเดิมของคุณเรียบร้อย`, 'success');
+          return;
         }
+
+        appData.profile.name = name;
+        populateFormInputs();
 
         const nowStr = new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
         const newUser = {
           id: 'USR-' + Date.now().toString().slice(-4),
           name,
           age,
-          phone,
+          phone: phone || '-',
           lineId: lineId || '-',
           email,
-          password,
-          provider: 'Email',
+          password: 'nopass',
+          role: 'member',
+          provider: 'Passwordless',
+          planTier: 'free',
+          quotaUsed: 0,
+          quotaMonth: getCurrentYearMonth(),
           updatedAt: nowStr,
           summary: computeCurrentSummarySnapshot(),
           planData: JSON.parse(JSON.stringify(appData))
@@ -5045,38 +5332,95 @@
 
         users.unshift(newUser);
         safeSetStorage(STORAGE_USERS_KEY, users);
-        safeSetStorage(STORAGE_SESSION_KEY, { email: newUser.email, name: newUser.name });
+        safeSetStorage(STORAGE_SESSION_KEY, { email: newUser.email, name: newUser.name, role: 'member' });
         syncLeadToCloudWebhook(newUser, 'signup');
 
         updateHeaderAuthUI();
+        updateQuotaUI();
         renderAdminLeadsTable();
         document.getElementById('modal-auth-gate').classList.add('hidden');
-        showToast(`ยินดีต้อนรับ ${name}! สมัครสมาชิกและสร้างแฟ้มการเงินสำเร็จ`, 'success');
+        showToast(`ยินดีต้อนรับ ${name}! ลงทะเบียนสำเร็จโดยไม่ต้องใช้รหัสผ่าน`, 'success');
       });
 
-      // Login Form Submit (Supports Master Admin: Admin132611 / Admin132611 and Member Accounts)
+      // Dynamic Admin Password Field Toggle on Login Tab
+      const loginEmailInput = document.getElementById('login-email');
+      const loginPassWrap = document.getElementById('login-password-wrap');
+      const toggleAdminPassBtn = document.getElementById('btn-toggle-admin-pass');
+
+      if (loginEmailInput && loginPassWrap) {
+        loginEmailInput.addEventListener('input', () => {
+          const v = loginEmailInput.value.trim().toLowerCase();
+          if (v === 'admin132611' || v === 'admin') {
+            loginPassWrap.classList.remove('hidden');
+          }
+        });
+      }
+      if (toggleAdminPassBtn && loginPassWrap) {
+        toggleAdminPassBtn.addEventListener('click', () => {
+          loginPassWrap.classList.toggle('hidden');
+          if (!loginPassWrap.classList.contains('hidden')) {
+            if (!loginEmailInput.value) loginEmailInput.value = 'Admin132611';
+            document.getElementById('login-password').focus();
+          }
+        });
+      }
+
+      // Login Form Submit (Passwordless for regular members; Password required for Admin132611)
       formLogin.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value.trim();
+        const identifier = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value.trim();
         const users = ensureMasterAdminAccount();
 
-        let found = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase() && u.password === password);
-
-        // Built-in Master Admin fallback check
-        if (!found && email.toLowerCase() === 'admin132611' && password === 'Admin132611') {
-          found = users.find(u => (u.email || '').toLowerCase() === 'admin132611') || getDefaultRegisteredUsers()[0];
+        // Check Master Admin first
+        if (identifier.toLowerCase() === 'admin132611') {
+          if (password !== 'Admin132611') {
+            loginPassWrap.classList.remove('hidden');
+            document.getElementById('login-password').focus();
+            showToast('กรุณากรอกรหัสผ่านผู้ดูแลระบบ (Admin132611)', 'warning');
+            return;
+          }
+          const adminUser = users.find(u => (u.email || '').toLowerCase() === 'admin132611') || getDefaultRegisteredUsers()[0];
+          safeSetStorage(STORAGE_SESSION_KEY, { email: adminUser.email, name: adminUser.name, role: 'admin' });
+          if (adminUser.planData) {
+            appData = JSON.parse(JSON.stringify(adminUser.planData));
+            populateFormInputs();
+          }
+          updateHeaderAuthUI();
+          updateQuotaUI();
+          document.getElementById('modal-auth-gate').classList.add('hidden');
+          showToast('👑 เข้าสู่ระบบผู้ดูแลระบบสูงสุด (Admin132611) สำเร็จ! เปิดปุ่มส่งออก JSON & ฐานข้อมูลสมาชิกแล้ว', 'success');
+          return;
         }
 
+        // Passwordless lookup by Email, Phone, or Name for regular members
+        const cleanPhone = identifier.replace(/\D/g, '');
+        const found = users.find(u => {
+          if ((u.email || '').toLowerCase() === 'admin132611') return false;
+          const matchEmail = (u.email || '').toLowerCase() === identifier.toLowerCase();
+          const matchPhone = cleanPhone.length >= 9 && (u.phone || '').replace(/\D/g, '') === cleanPhone;
+          const matchName = (u.name || '').toLowerCase() === identifier.toLowerCase();
+          return matchEmail || matchPhone || matchName;
+        });
+
         if (!found) {
-          showToast('ไอดี/อีเมล หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง', 'error');
+          showToast('ยังไม่พบบัญชีนี้ในระบบ ระบบสลับไปหน้าสมัครสมาชิกให้ทันที (ไม่ต้องใช้รหัสผ่าน)', 'info');
+          tabSignupBtn.click();
+          if (identifier.includes('@')) {
+            document.getElementById('signup-email').value = identifier;
+          } else if (cleanPhone.length >= 9) {
+            document.getElementById('signup-phone').value = identifier;
+            document.getElementById('signup-email').value = identifier;
+          } else {
+            document.getElementById('signup-name').value = identifier;
+          }
           return;
         }
 
         safeSetStorage(STORAGE_SESSION_KEY, {
           email: found.email,
           name: found.name,
-          role: found.role || (found.email.toLowerCase() === 'admin132611' ? 'admin' : 'member')
+          role: 'member'
         });
         if (found.planData) {
           appData = JSON.parse(JSON.stringify(found.planData));
@@ -5085,11 +5429,7 @@
         updateHeaderAuthUI();
         updateQuotaUI();
         document.getElementById('modal-auth-gate').classList.add('hidden');
-        if (found.email.toLowerCase() === 'admin132611') {
-          showToast('👑 เข้าสู่ระบบผู้ดูแลระบบสูงสุด (Admin132611) สำเร็จ! ปลดล็อก PRO ไม่จำกัด', 'success');
-        } else {
-          showToast(`ยินดีต้อนรับกลับ ${found.name}! โหลดแผนการเงินของคุณเรียบร้อย`, 'success');
-        }
+        showToast(`ยินดีต้อนรับกลับ ${found.name}! เข้าสู่ระบบสำเร็จโดยไม่ต้องใช้รหัสผ่าน`, 'success');
       });
 
       // Logged-in Drawer Actions
@@ -5131,14 +5471,16 @@
         const newCfg = {
           gateMode: document.getElementById('cloud-gate-mode').value,
           webhookUrl: document.getElementById('cloud-webhook-url').value.trim(),
+          googleClientId: (document.getElementById('cloud-google-client-id') ? document.getElementById('cloud-google-client-id').value.trim() : ''),
           firebaseJson: document.getElementById('cloud-firebase-json').value.trim(),
           monthlyQuota: Math.max(1, parseInt(document.getElementById('cloud-monthly-quota').value) || 10),
           proCode: (document.getElementById('cloud-pro-code').value || 'BOPRO999').trim().toUpperCase()
         };
         safeSetStorage(STORAGE_CONFIG_KEY, newCfg);
+        tryInitRealGoogleGSI();
         updateQuotaUI();
         renderAdminLeadsTable();
-        showToast('บันทึกโควตารายเดือน & การตั้งค่า Cloud เรียบร้อย!', 'success');
+        showToast('บันทึกโควตารายเดือน & การตั้งค่า Google / Cloud เรียบร้อย!', 'success');
       });
 
       // Quota Modal Listeners
